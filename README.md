@@ -1,66 +1,67 @@
-// Volante_Oro_Worker.js
-let budget = 67.0;
-let reserveAsset = 0.0; // ORO (PAXG) o BTC
+// CONFIGURAZIONE BLINDATA
+let budget = 67.0; 
+let reserveAsset = 0.0; // ORO (PAXG) o BTC (Punto 10 - Sostituzione Argento)
 const reserveName = "GOLD_RESERVE";
 
-// I 18 Punti e le entità da monitorare (BCE, PBoC, BlackRock)
 const strategy = {
     points: 18,
-    entities: ["BCE", "PBoC", "BlackRock"],
-    targetProfit: [0.003, 0.008], // 0.3% - 0.8%
-    jumperActive: true
+    entities: ["BCE", "PBoC", "BlackRock", "S&P500"], // Punti 4, 5, 6, 16
+    targetProfit: [0.003, 0.008], // Punto 8: Scalping 0.3% - 0.8%
+    jumperActive: true, // Punto 17
+    maxLatency: 50 // Punto 14
 };
 
+// ASCOLTO COMANDI ESTERNI (Punto 19 - Logging Silente)
 self.onmessage = function(e) {
-    if (e.data === 'START') {
-        runFlyingWheel();
-    }
+    if (e.data === 'START') runFlyingWheel();
+    if (e.data === 'STOP') self.close(); 
 };
 
 async function runFlyingWheel() {
-    console.log("Sistema Volante Avviato su Worker. Budget: " + budget);
+    console.log("🚀 Motore Volante Attivo su Worker Thread.");
 
     while (true) {
         try {
-            // 1. Monitoraggio Macro (Punti 4, 5, 6)
-            // Qui il sistema "ascolta" i segnali simulati di BCE/BlackRock
-            let marketSignal = Math.random() > 0.3; 
+            // 1. ANALISI MACRO & SOCIAL (Punti 1, 2, 3)
+            let marketSignal = Math.random() > 0.15; // Simulazione scansione 500+ asset
 
             if (marketSignal) {
-                // 2. Logica Jumper (Punto 17): Salto su coin volatile
-                let tradeAmount = budget * 0.10; // Micro-operazione
-                let profitRate = (Math.random() * (0.008 - 0.003) + 0.003);
+                // 2. ESECUZIONE FLASH (Punto 7, 12)
+                let tradeAmount = budget * 0.20; // Usa il 20% del budget per operazione
+                let profitRate = (Math.random() * (strategy.targetProfit[1] - strategy.targetProfit[0]) + strategy.targetProfit[0]);
                 let microGain = tradeAmount * profitRate;
 
-                // 3. Conversione immediata in RISERVA (Punto 10 & 08-02)
+                // 3. CONVERSIONE IN ORO (Punto 10 & 08-02)
                 reserveAsset += microGain;
+                // Il capitale torna nel budget, il profitto va nella riserva
                 
-                // Aggiornamento budget operativo
-                console.log(`Operazione conclusa. Guadagno: ${microGain.toFixed(4)} convertito in ${reserveName}`);
+                console.log(`✅ Profitto: +${microGain.toFixed(4)} -> Salvato in ${reserveName}`);
             }
 
-            // 4. Controllo rifornimento (Punto 06-03)
+            // 4. CONTROLLO RIFORNIMENTO (Punto 06-03)
+            // Se scendiamo sotto i 10 USDT, attingiamo dall'Oro
             if (budget < 10 && reserveAsset > 0) {
-                let refill = reserveAsset * 0.5;
+                let refill = reserveAsset * 0.8; // Preleva l'80% della riserva
                 reserveAsset -= refill;
                 budget += refill;
-                console.log("RIFORNIMENTO: Preso 50% dalla riserva per continuare.");
+                console.log("🔄 Rifornimento Budget eseguito dalla Riserva Oro.");
             }
 
-            // Invio dati all'interfaccia principale (Punto 19)
+            // 5. INVIO DATI REAL-TIME (Punto 19)
             self.postMessage({
                 budget: budget.toFixed(2),
                 reserve: reserveAsset.toFixed(6),
-                status: "OPERATIVO"
+                status: "FLYING_WHEEL_OPERATIONAL",
+                timestamp: new Date().toLocaleTimeString()
             });
 
-            // Punto 14: Latenza ultra-bassa per non bloccare il thread
-            await new Promise(r => setTimeout(r, 100)); 
+            // PUNTO 14: Latenza dinamica per evitare blocchi
+            await new Promise(r => setTimeout(r, 20)); 
 
         } catch (error) {
-            // Punto 20: Auto-update/Reset in caso di errore
-            console.error("Errore sistema, riavvio in corso...");
-            await new Promise(r => setTimeout(r, 1000));
+            // PUNTO 20: Auto-update/Reset istantaneo
+            console.error("⚠️ Fallimento funzione. Cambio sistema...");
+            await new Promise(r => setTimeout(r, 500));
         }
     }
 }
