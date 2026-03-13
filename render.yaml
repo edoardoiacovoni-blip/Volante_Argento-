@@ -4,7 +4,7 @@ services:
 - type: worker
   name: flying-wheel-argento
   runtime: node
-  repo: https://github.com/edoardoiacovoni-blip/volante
+  repo: https://github.com/edoardoiacovoni-blip/volante-argento
   plan: standard
   envVars:
   - key: API_SECRET
