@@ -1,0 +1,23 @@
+# Exported from Render on 2026-03-13T06:19:29Z
+version: "1"
+services:
+- type: worker
+  name: flying-wheel-argento
+  runtime: node
+  repo: https://github.com/render-examples/express-hello-world
+  plan: standard
+  envVars:
+  - key: API_SECRET
+    sync: false
+  - key: API_KEY
+    sync: false
+  - key: BOT_CODE
+    sync: false
+  - key: BOT_MODE
+    sync: false
+  region: frankfurt
+  buildCommand: yarn --frozen-lockfile install
+  startCommand: npm install ccxt && echo "$BOT_CODE" > app.js && node app.js
+  autoDeployTrigger: commit
+  previews:
+    generation: automatic
