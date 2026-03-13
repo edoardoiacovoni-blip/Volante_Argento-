@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VOLANTE ARGENTO - DASHBOARD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { background: #000; color: #00ff00; font-family: monospace; text-align: center; padding: 20px; }
+        .box { border: 2px solid #00ff00; padding: 15px; margin: 10px auto; max-width: 300px; border-radius: 10px; }
+        .val { font-size: 24px; font-weight: bold; color: #fff; }
+        button { background: #00ff00; color: #000; padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; }
+        #log { font-size: 10px; color: #888; margin-top: 20px; height: 100px; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <h2>🚀 FLYING WHEEL ULTRA</h2>
+    
+    <div class="box">
+        USDT OPERATIVI (Budget)<br>
+        <div id="budget" class="val">67.00</div>
+    </div>
+
+    <div class="box">
+        RISERVA ORO (PAXG/BTC)<br>
+        <div id="reserve" class="val">0.000000</div>
+    </div>
+
+    <button onclick="startSystem()">AVVIA SISTEMA</button>
+
+    <div id="log">In attesa di avvio...</div>
+
+    <script>
+        let worker;
+        function startSystem() {
+            // Sostituisci 'Volante_Oro_Worker.js' con il nome esatto del tuo file su GitHub
+            worker = new Worker('Volante_Oro_Worker.js'); 
+            document.getElementById('log').innerText = "Sistema in esecuzione...";
+            
+            worker.onmessage = function(e) {
+                document.getElementById('budget').innerText = e.data.budget;
+                document.getElementById('reserve').innerText = e.data.reserve;
+                let newLog = document.createElement('div');
+                newLog.innerText = `[${e.data.timestamp}] Operazione eseguita...`;
+                document.getElementById('log').prepend(newLog);
+            };
+        }
+    </script>
+</body>
+</html>
